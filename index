@@ -1,174 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>​
+    <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>​
 </head>
-<style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 350px;
-        }
-        h1 {
-            color: #e3350d;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #3182ce;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #2b6cb0;
-        }
-        .pokemon-card {
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-            background-color: #f7fafc;
-            display: none;
-        }
-        .pokemon-img {
-            width: 150px;
-            height: 150px;
-        }
-        .pokemon-name {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 10px 0;
-            text-transform: capitalize;
-        }
-        .type-badge {
-            display: inline-block;
-            background-color: #cbd5e0;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin: 5px;
-        }
-        .error {
-            color: #e53e3e;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-    </style>
-</head>
+
 <body>
-
-<div class="container">
-    <h1>ポケモン図鑑検索</h1>
-    <div class="search-box">
-        <input type="number" id="pokemonId" placeholder="図鑑No.を入力 (例: 25)" min="1">
-        <button onclick="getPokemon()">検索</button>
-    </div>
-
-    <div id="error-message" class="error"></div>
-
-    <div id="pokemonCard" class="pokemon-card">
-        <img id="pokeImage" class="pokemon-img" src="" alt="ポケモンの画像">
-        <div id="pokeName" class="pokemon-name"></div>
-        <div id="pokeTypes"></div>
-    </div>
-</div>
-
-<script>
-    async function getPokemon() {
-        const id = document.getElementById('pokemonId').value;
-        const card = document.getElementById('pokemonCard');
-        const errorDiv = document.getElementById('error-message');
-
-        // 表示の初期化
-        card.style.display = 'none';
-        errorDiv.innerText = '';
-
-        if (!id) {
-            errorDiv.innerText = '数値を入力してください。';
-            return;
-        }
-
-        try {
-            // PokeAPIからデータを取得
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-            
-            if (!response.ok) {
-                throw new Error('ポケモンが見つかりませんでした。');
-            }
-
-            const data = await response.json();
-
-            // 日本語名を取得するためにspeciesのデータを取得
-            const speciesResponse = await fetch(data.species.url);
-            const speciesData = await speciesResponse.json();
-            
-            // 日本語名を探す（なければ英語名）
-            const japaneseNameJa = speciesData.names.find(name => name.language.name === 'ja');
-            const pokemonName = japaneseNameJa ? japaneseNameJa.name : data.name;
-
-            // データの反映
-            document.getElementById('pokeImage').src = data.sprites.front_default || data.sprites.other['official-artwork'].front_default;
-            document.getElementById('pokeName').innerText = `No.${data.id} ${pokemonName}`;
-            
-            // タイプの表示処理
-            const typesDiv = document.getElementById('pokeTypes');
-            typesDiv.innerHTML = ''; // 一度クリア
-
-            for (const typeInfo of data.types) {
-                const typeResponse = await fetch(typeInfo.type.url);
-                const typeData = await typeResponse.json();
-                const japaneseType = typeData.names.find(name => name.language.name === 'ja');
-                const typeName = japaneseType ? japaneseType.name : typeInfo.type.name;
-
-                const span = document.createElement('span');
-                span.className = 'type-badge';
-                span.innerText = typeName;
-                typesDiv.appendChild(span);
-            }
-
-            // カードを表示
-            card.style.display = 'block';
-
-        } catch (error) {
-            errorDiv.innerText = error.message;
-        }
-    }
-
-    document.getElementById('pokemonId').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            getPokemon();
-        }
-    });
-</script>
-
+    <a-scene a-embedded arjs="sourceType: webcam">
+        <a-marker preset="hiro">
+            <a-box position="0 0.5 0" color="skyblue">
+            <a-box position="0 1 0" color="skyblue">
+            <a-box position="0 0 0" color="skyblue"></a-box>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
+
 </html>
